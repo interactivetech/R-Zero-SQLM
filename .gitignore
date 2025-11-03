@@ -1,0 +1,29 @@
+# Python cache files  
+verl/workers/sharding_manager/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+__pycache__/  
+*.pyc  
+*.pyo  
+*.pyd  
+  
+# Log files  
+*.log  
+output*.log  
+test.json
+# Generated data and results  
+scores_distribution.png  
+  
+# Temporary/experimental scripts  
+final_steps.txt  
+  
+# Weights & Biases logs  
+wandb/
+  
+# IDE and editor files (optional)  
+.vscode/  
+.idea/  
+*.swp  
+*.swo

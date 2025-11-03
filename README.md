@@ -1,5 +1,44 @@
 # *R-Zero*: Self-Evolving Reasoning LLM from Zero Data
 
+* `python3.12 -m venv /scratch0/mendeza/r-zero-env`
+* `[mendeza@csd00 ~]$ source /scratch0/mendeza/r-zero-env/bin/activate`
+* `pip install torch==2.7.0 numpy yaml stopit`
+* source: https://www.reddit.com/r/LocalLLaMA/comments/1no4ho1/some_things_i_learned_about_installing_flashattn/
+* `module load cuda`
+* `pip install --no-build-isolation "git+https://github.com/Dao-AILab/flash-attention.git@v2.7.4.post1"`
+* `pip install -r requirements.txt`
+
+
+```bash
+export TMPDIR=/scratch0/$USER/apptainer_tmp
+export APPTAINER_TMPDIR=$TMPDIR
+export APPTAINER_CACHEDIR=/scratch0/$USER/apptainer_cache
+export APPTAINER_HOME=/scratch0/$USER/.apptainer_home
+
+mkdir -p $TMPDIR $APPTAINER_CACHEDIR $APPTAINER_HOME
+cd /scratch0/$USER
+
+apptainer pull verl.sif docker://verlai/verl:app-verl0.5-transformers4.55.4-vllm0.10.0-mcore0.13.0-te2.2
+cd ~/
+apptainer exec --nv --bind /scratch0:/scratch0 --bind $PWD:/workspace /scratch0/mendeza/verl.sif bash
+
+Downgraded NumPy to resolve dependency conflicts with megatron-core and lightning-thunder: requirements.txt:93
+
+pip install "numpy<2.0.0"
+Force reinstalled PyTorch to ensure clean installation: requirements.txt:183
+
+pip install --force-reinstall --no-cache-dir torch==2.7.0
+Reinstalled NCCL to ensure version consistency: requirements.txt:106
+
+pip install --force-reinstall nvidia-nccl-cu12==2.26.2
+Set LD_LIBRARY_PATH permanently to prioritize the correct NCCL libraries:
+
+echo 'export LD_LIBRARY_PATH=/scratch0/mendeza/.apptainer_home/.local/lib/python3.10/site-packages/nvidia/nccl/lib:$LD_LIBRARY_PATH' >> ~/.bashrc  
+source ~/.bashrc
+Verified the fix by checking NCCL version:
+
+python -c "import torch; print(torch.cuda.nccl.version())"
+```
 > Teach Large Language Models to reason and evolve on their own, starting with nothing but a base model. No data required.
 
 Check  out our [paper](https://arxiv.org/abs/2508.05004) or [webpage](https://chengsong-huang.github.io/R-Zero.github.io/)  for the details
@@ -40,6 +79,19 @@ This process creates a perfectly tailored, adaptive curriculum. The Challenger l
 ---
 
 ## ⚡️ Quickstart Guide
+key conversation: https://deepwiki.com/search/i-ran-the-startsh-script-and-i_4879d791-d47b-449b-8834-dd51450f8121?mode=fast
+export TMPDIR=/scratch0/$USER/apptainer_tmp
+export APPTAINER_TMPDIR=$TMPDIR
+export APPTAINER_CACHEDIR=/scratch0/$USER/apptainer_cache
+export APPTAINER_HOME=/scratch0/$USER/.apptainer_home
+
+mkdir -p $TMPDIR $APPTAINER_CACHEDIR $APPTAINER_HOME
+cd /scratch0/$USER
+
+apptainer pull verl.sif docker://verlai/verl:app-verl0.5-transformers4.55.4-vllm0.10.0-mcore0.13.0-te2.2
+cd ~/
+apptainer exec --nv --bind /scratch0:/scratch0 --bind $PWD:/workspace /scratch0/mendeza/verl.sif bash
+
 
 Getting started is easy! Just follow these steps.
 ### 1. Configure Environment and Prepare Dirs
@@ -50,10 +102,24 @@ git clone https://github.com/Chengsong-Huang/R-Zero.git
 cd R-Zero
 # Install the required packages
 pip install -r requirements.txt
+
+pip install "numpy<2.0.0"
+Force reinstalled PyTorch to ensure clean installation: requirements.txt:183
+
+pip install --force-reinstall --no-cache-dir torch==2.7.0
+Reinstalled NCCL to ensure version consistency: requirements.txt:106
+pip install stopit
+
 # Set an environment variable for your storage path.
 # This is a large directory where checkpoints and generated data will be saved.
-export STORAGE_PATH="/path/to/your/storage"
-export HUGGINGFACENAME="yourhuggingfacename"
+export STORAGE_PATH="/scratch0/mendeza/storage"
+export HUGGINGFACENAME="mendeza-umd"
+
+export WANDB_API_KEY=7ac71ae3a1191ddb6de757ad0c093bb311f44a04
+export WANDB_INSECURE_DISABLE_SSL=true
+export WANDB_ENTITY=sqlm_umd
+export WANDB_PROJECT=r_zero
+
 
 mkdir -p \
   "$STORAGE_PATH/evaluation" \
@@ -78,7 +144,11 @@ You can replicate all of our experimental results with a single script.
 # Format: bash scripts/main.sh [Base_Model_Name] [Abbreviation]
 
 # Example using Qwen/Qwen3-4B-Base:
-bash scripts/main.sh Qwen/Qwen3-4B-Base qwen3-4b
+bash scripts/main.sh Qwen/Qwen3-4B-Base qwen3-4b 2>&1 | tee output2.log
+bash scripts/main.sh Qwen/Qwen3-0.6B qwen3-06b 2>&1 | tee output4.log
+bash scripts/main2.sh Qwen/Qwen3-4B-Base 10 qwen3-4b_4gpu 2>&1 | tee output5.log
+
+
 ```
 
 ## 📊 Impressive Results

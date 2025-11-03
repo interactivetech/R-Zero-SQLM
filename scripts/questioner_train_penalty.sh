@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export CUDA_VISIBLE_DEVICES=0,1,2,3  
 solver_model_path=$1
 questioner_model_path=$2
 save_path=$3

@@ -1,3 +1,5 @@
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES=0,1,2,3  
 Base_model=$1
 Model_abbr=$2
 echo "Model_abbr: $Model_abbr"
