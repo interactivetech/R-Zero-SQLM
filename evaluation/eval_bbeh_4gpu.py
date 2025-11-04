@@ -139,7 +139,9 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str, required=True, help="Path to the model directory")  
     parser.add_argument("--output_file", type=str, default="outputs_4gpu.json", help="File to save results")  
     parser.add_argument("--tensor_parallel_size", type=int, default=4, help="Number of GPUs for tensor parallelism")  
-    parser.add_argument("--gpu_memory_utilization", type=float, default=0.85, help="GPU memory utilization")  
+    parser.add_argument("--gpu_memory_utilization", type=float, default=0.7, help="GPU memory utilization")  
+    parser.add_argument("--max_model_len", type=int, default=None, help="Maximum model sequence length")
+
     args = parser.parse_args()  
       
     print(f"[eval_bbeh_4gpu] Initializing with {args.tensor_parallel_size} GPUs...")  
@@ -148,7 +150,8 @@ if __name__ == "__main__":
     llm = LLM(  
         model=args.model_path,  
         tensor_parallel_size=args.tensor_parallel_size,  
-        gpu_memory_utilization=args.gpu_memory_utilization  
+        gpu_memory_utilization=args.gpu_memory_utilization,
+        max_model_len=args.max_model_len,  
     )  
       
     dataset = datasets.load_dataset('MrLight/bbeh-eval')  

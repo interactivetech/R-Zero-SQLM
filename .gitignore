@@ -3,7 +3,7 @@ verl/workers/sharding_manager/__pycache__/
 *.pyc
 *.pyo
 *.pyd
-
+storage/
 __pycache__/  
 *.pyc  
 *.pyo  

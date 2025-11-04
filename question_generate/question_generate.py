@@ -53,7 +53,7 @@ def main(args):
     model = vllm.LLM(
         model=args.model,
         tokenizer=args.model,
-        # gpu_memory_utilization=0.8,
+        gpu_memory_utilization=0.7,
         seed=int(args.suffix),
     )
     dataset_handler = get_dataset_handler("math")
